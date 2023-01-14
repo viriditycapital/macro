@@ -1,24 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+
+enum Tab {
+  Macro,
+  Stocks,
+  Options,
+  Twitter,
+}
+
+enum Timeframe {
+  "1w",
+  "2w",
+  "1m",
+  "3m",
+  "6m",
+  "1y",
+  "2y",
+  "5y",
+  "10y",
+}
 
 function App() {
+  const tabComponents = [];
+  for (const tab in Tab) {
+    if (Number(tab) >= 0) {
+      tabComponents.push(
+        <div className="tab">
+          {Tab[tab]}
+        </div>
+      );
+    }
+  }
+
+  const timeFrames = [];
+  for (const time in Timeframe) {
+    if (Number(time) >= 0) {
+      timeFrames.push(
+        <div className="timeframe">
+          {Timeframe[time]}
+        </div>
+      );
+    }
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="tab-wrapper">
+        {tabComponents}
+      </div>
+      <div className="timeframe-wrapper">
+        {timeFrames}
+      </div>
     </div>
   );
 }
