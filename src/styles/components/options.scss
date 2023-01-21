@@ -1,0 +1,29 @@
+#expiration-dates {
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+
+  .opex-date {
+    margin: 8px;
+    transition-duration: 200ms;
+
+    &.selected {
+      font-weight: bold;
+    }
+  }
+}
+
+#options-prices {
+  display: flex;
+  flex-direction: column;
+
+  .options-row {
+    display: flex;
+    flex-direction: row;
+
+    .cell {
+      margin: 4px;
+      width: 60px;
+    }
+  }
+}

@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+
+html, body {
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+}
+
+a:hover,
+a:visited,
+a:link,
+a:active {
+  text-decoration: none;
+  color: white;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+#main {
+  background: black;
+  color: white;
+  width: 100vw;
+}
+
+#news {
+  #news-articles {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.tab-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.timeframe-wrapper {
+  display: flex;
+  flex-direction: row;
+
+  .timeframe {
+    border: 1px solid white;
+    margin: 4px;
+    cursor: pointer;
+  }
+}

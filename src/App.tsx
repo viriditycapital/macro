@@ -24,7 +24,7 @@ function App() {
   for (const tab in Tab) {
     if (Number(tab) >= 0) {
       tabComponents.push(
-        <div className="tab">
+        <div className="tab" id={tab}>
           {Tab[tab]}
         </div>
       );
@@ -35,12 +35,24 @@ function App() {
   for (const time in Timeframe) {
     if (Number(time) >= 0) {
       timeFrames.push(
-        <div className="timeframe">
+        <div className="timeframe" key={time}>
           {Timeframe[time]}
         </div>
       );
     }
   }
+
+  // Stock data
+  useEffect(() => {
+    Promise.all([
+      fetch(`/api/stonks/^GSPC`).then(res => res.json()),
+      // fetch(`/api/stonks/^VIX`).then(res => res.json()),
+      fetch(`/api/fred/T10Y2Y`).then(res => res.json()),
+    ])
+      .then(data => {
+        console.log(data);
+      });
+  }, []);
 
   return (
     <div className="App">

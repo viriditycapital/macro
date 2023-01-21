@@ -1,7 +1,8 @@
-const express = require("express");
-const yahooFinance = require("yahoo-finance2").default; // NOTE the .default
-const KEYS = require("../keys/keys.json");
-const { TwitterApi } = require("twitter-api-v2");
+import express from "express";
+import yahooFinance from 'yahoo-finance2';
+import { KEYS } from "../keys/keys.mjs";
+import { TwitterApi } from "twitter-api-v2";
+import fetch from 'node-fetch';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -77,6 +78,15 @@ app.get("/api/tweets/:user", async (req, res) => {
 
   res.send({
     tweets,
+  });
+});
+
+app.get("/api/fred/:series", async (req, res) => {
+  let series = req.params.series;
+  const response = await fetch(`https://api.stlouisfed.org/fred/series/observations?series_id=${series}&api_key=${KEYS.fred.key}&file_type=json`).then(res => res.json());
+
+  res.send({
+    response
   });
 });
 
