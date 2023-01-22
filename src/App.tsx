@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Plotly, { Data, Layout, OhclData } from 'plotly.js-dist-min'
+import Plotly, { Data, Layout } from 'plotly.js-dist-min'
 
 enum Tab {
   Macro,
@@ -9,18 +9,22 @@ enum Tab {
 }
 
 enum Timeframe {
-  "1w",
-  "2w",
-  "1m",
-  "3m",
-  "6m",
-  "1y",
-  "2y",
-  "5y",
-  "10y",
+  "1w" = 5 * 24 * 60 * 60,
+  "2w" = 2 * 5 * 24 * 60 * 60,
+  "1m" = 4 * 5 * 24 * 60 * 60,
+  "3m" = 12 * 5 * 24 * 60 * 60,
+  "6m" = 24 * 5 * 24 * 60 * 60,
+  "1y" = 365.25 * 24 * 60 * 60,
+  "2y" = 2 * 365.25 * 24 * 60 * 60,
+  "5y" = 5 * 365.25 * 24 * 60 * 60,
+  "10y" = 10 * 365.25 * 24 * 60 * 60,
 }
 
 function App() {
+  // State
+  const [timeFrame, setTimeFrame] = useState(Timeframe["3m"]);
+
+  // UI components
   const tabComponents = [];
   for (const tab in Tab) {
     if (Number(tab) >= 0) {
@@ -46,9 +50,10 @@ function App() {
   // Stock data
   useEffect(() => {
     Promise.all([
-      fetch(`/api/stonks/^GSPC`).then(res => res.json()),
+      fetch(`/api/stonks/^GSPC?startDate=${Number(new Date()) - timeFrame.valueOf()*1000}`).then(res => res.json()),
       // fetch(`/api/stonks/^VIX`).then(res => res.json()),
       fetch(`/api/fred/T10Y2Y`).then(res => res.json()),
+      fetch(`/api/fred/FPCPITOTLZGUSA`).then(res => res.json()),
     ])
       .then(data => {
         console.log(data);
@@ -56,7 +61,7 @@ function App() {
 
         const historical = data[0].historical;
 
-        const trace: Data ={
+        const trace: Data = {
           x: unpack(historical, 'date'),
           close: unpack(historical, 'close'),
           high: unpack(historical, 'high'),
@@ -87,6 +92,9 @@ function App() {
           yaxis: {
             autorange: true,
             type: 'linear'
+          },
+          title: {
+            text: 'SPX'
           }
         };
 
@@ -94,14 +102,35 @@ function App() {
 
         // Yields
         const yieldData = data[1].response.observations;
-        const traceYields: Data ={
+        const traceYields: Data = {
           x: unpack(yieldData, 'date'),
           y: unpack(yieldData, 'value'),
           xaxis: 'x',
           yaxis: 'y',
         };
+        const layoutYields: Partial<Layout> = {
+          title: {
+            text: '10YR - 2YR Bond Yields'
+          }
+        }
 
-        Plotly.newPlot('chart-yield-inversion', [traceYields]);
+        Plotly.newPlot('chart-yield-inversion', [traceYields], layoutYields);
+
+        // Inflation
+        const inflationData = data[2].response.observations;
+        const traceInflation: Data = {
+          x: unpack(inflationData, 'date'),
+          y: unpack(inflationData, 'value'),
+          xaxis: 'x',
+          yaxis: 'y',
+        };
+        const layoutInflation: Partial<Layout> = {
+          title: {
+            text: 'Consumer Inflation (US)'
+          }
+        }
+
+        Plotly.newPlot('chart-inflation', [traceInflation], layoutInflation);
       });
   }, []);
 
@@ -115,6 +144,7 @@ function App() {
       </div>
       <div className="chart" id='chart-spx'></div>
       <div className="chart" id='chart-yield-inversion'></div>
+      <div className="chart" id='chart-inflation'></div>
     </div>
   );
 }

@@ -10,8 +10,16 @@ const port = process.env.PORT || 3001;
 const client = new TwitterApi(KEYS.twitter.bearer_token);
 
 app.get("/api/stonks/:ticker", async (req, res) => {
+  const startDate = req.query.startDate;
+ 
   let date = new Date();
-  date.setDate(date.getDate() - 30);
+  if (startDate != null) {
+    date = new Date(Number(startDate));
+  } else {
+    // Default to 30 days 
+    date.setDate(date.getDate() - 30);
+  }
+
   const search = await yahooFinance.search(req.params.ticker);
 
   let quotes;
