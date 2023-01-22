@@ -32,7 +32,7 @@ app.get("/api/stonks/:ticker", async (req, res) => {
   const historical = await yahooFinance.historical(req.params.ticker, {
     period1: date,
     period2: new Date(),
-    interval: "1d",
+    // interval: "1d",
   });
 
   res.send({

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import Plotly, { Data, Layout } from 'plotly.js-dist-min'
 
+// Static data
+import USREC from './data/USREC.json';
+
 enum Tab {
   Macro,
   Stocks,
@@ -9,11 +12,11 @@ enum Tab {
 }
 
 enum Timeframe {
-  "1w" = 5 * 24 * 60 * 60,
-  "2w" = 2 * 5 * 24 * 60 * 60,
-  "1m" = 4 * 5 * 24 * 60 * 60,
-  "3m" = 12 * 5 * 24 * 60 * 60,
-  "6m" = 24 * 5 * 24 * 60 * 60,
+  "1w" = 7 * 24 * 60 * 60,
+  "2w" = 14 * 24 * 60 * 60,
+  "1m" = 30 * 24 * 60 * 60,
+  "3m" = 90 * 24 * 60 * 60,
+  "6m" = 180 * 24 * 60 * 60,
   "1y" = 365.25 * 24 * 60 * 60,
   "2y" = 2 * 365.25 * 24 * 60 * 60,
   "5y" = 5 * 365.25 * 24 * 60 * 60,
@@ -22,7 +25,7 @@ enum Timeframe {
 
 function App() {
   // State
-  const [timeFrame, setTimeFrame] = useState(Timeframe["3m"]);
+  const [timeFrame, setTimeFrame] = useState(Timeframe["6m"]);
 
   // UI components
   const tabComponents = [];
@@ -50,10 +53,10 @@ function App() {
   // Stock data
   useEffect(() => {
     Promise.all([
-      fetch(`/api/stonks/^GSPC?startDate=${Number(new Date()) - timeFrame.valueOf()*1000}`).then(res => res.json()),
-      // fetch(`/api/stonks/^VIX`).then(res => res.json()),
+      fetch(`/api/stonks/^GSPC?startDate=${Number(new Date()) - timeFrame.valueOf() * 1000}`).then(res => res.json()),
       fetch(`/api/fred/T10Y2Y`).then(res => res.json()),
       fetch(`/api/fred/FPCPITOTLZGUSA`).then(res => res.json()),
+      fetch(`/api/stonks/^VIX?startDate=${Number(new Date()) - timeFrame.valueOf() * 1000}`).then(res => res.json()),
     ])
       .then(data => {
         console.log(data);
@@ -68,8 +71,8 @@ function App() {
           low: unpack(historical, 'low'),
           open: unpack(historical, 'open'),
 
-          increasing: { line: { color: 'green' } },
-          decreasing: { line: { color: 'red' } },
+          increasing: { line: { color: 'green', width: 1 } },
+          decreasing: { line: { color: 'red' , width: 1 } },
 
           xaxis: 'x',
           yaxis: 'y',
@@ -95,10 +98,65 @@ function App() {
           },
           title: {
             text: 'SPX'
-          }
+          },
+          shapes: [
+            {
+              type: 'line',
+              xref: 'paper',
+              x0: 0,
+              y0: 4000,
+              x1: 1,
+              y1: 4000,
+              line: {
+                color: 'purple',
+                width: 2,
+              }
+            }
+          ]
         };
 
         Plotly.newPlot('chart-spx', dataPlot, layout);
+
+        // VIX
+        const vixData = data[3].historical;
+
+        const traceVIX: Data = {
+          x:     unpack(vixData, 'date'),
+          close: unpack(vixData, 'close'),
+          high:  unpack(vixData, 'high'),
+          low:   unpack(vixData, 'low'),
+          open:  unpack(vixData, 'open'),
+
+          increasing: { line: { color: 'green', width: 1 } },
+          decreasing: { line: { color: 'red' , width: 1 } },
+
+          xaxis: 'x',
+          yaxis: 'y',
+          type: 'candlestick'
+        };
+
+        const layoutVIX: Partial<Layout> = {
+          dragmode: 'zoom',
+          showlegend: false,
+          xaxis: {
+            autorange: true,
+            title: 'Date',
+            type: 'date',
+            rangeslider: {
+              visible: false
+            }
+          },
+          yaxis: {
+            autorange: true,
+            type: 'linear'
+          },
+          title: {
+            text: 'VIX'
+          },
+        };
+
+        Plotly.newPlot('chart-vix', [traceVIX], layoutVIX);
+        
 
         // Yields
         const yieldData = data[1].response.observations;
@@ -143,6 +201,7 @@ function App() {
         {timeFrames}
       </div>
       <div className="chart" id='chart-spx'></div>
+      <div className="chart" id='chart-vix'></div>
       <div className="chart" id='chart-yield-inversion'></div>
       <div className="chart" id='chart-inflation'></div>
     </div>
