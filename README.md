@@ -40,3 +40,7 @@ The idea of this project is to be able to look at economic indicators and _appro
 ## TODO
 
 1. Recession Indicator: instead of doing a lot of work over and over again, we should preprocess it so that we just have a range of dates that are recessions. Then we can probably just filter from there
+
+## Extra
+
+1. Prevent Node JS from crashing on bad requests

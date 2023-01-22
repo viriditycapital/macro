@@ -94,11 +94,13 @@ function App() {
             type: 'date',
             rangeslider: {
               visible: false
-            }
+            },
+            showgrid: false,
           },
           yaxis: {
             autorange: true,
-            type: 'linear'
+            type: 'linear',
+            showgrid: false,
           },
           title: {
             text: 'SPX'
