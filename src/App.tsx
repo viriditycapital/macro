@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Plotly from 'plotly.js'
 
 enum Tab {
   Macro,
@@ -24,7 +25,7 @@ function App() {
   for (const tab in Tab) {
     if (Number(tab) >= 0) {
       tabComponents.push(
-        <div className="tab" id={tab}>
+        <div className="tab" id={tab} key={tab}>
           {Tab[tab]}
         </div>
       );
@@ -50,7 +51,44 @@ function App() {
       fetch(`/api/fred/T10Y2Y`).then(res => res.json()),
     ])
       .then(data => {
-        console.log(data);
+        const unpack = (rows: any, key: string) => rows.map((row: any) => row[key]);
+
+        const historical = data[0].historical;
+
+        var trace: Partial<Plotly.OhclData> ={
+          x: unpack(historical, 'date'),
+          close: unpack(historical, 'close'),
+          high: unpack(historical, 'high'),
+          low: unpack(historical, 'low'),
+          open: unpack(historical, 'open'),
+
+          increasing: { line: { color: 'green' } },
+          decreasing: { line: { color: 'red' } },
+
+          xaxis: 'x',
+          yaxis: 'y',
+          // type: 'ohlc'
+        };
+
+        const dataPlot: Plotly.Data[] = [trace];
+
+        const layout: Partial<Plotly.Layout> = {
+          dragmode: 'zoom',
+          showlegend: false,
+          xaxis: {
+            autorange: true,
+            title: 'Date',
+            type: 'date'
+          },
+          yaxis: {
+            autorange: true,
+            type: 'linear'
+          }
+        };
+
+        console.log(dataPlot, layout)
+
+        Plotly.newPlot('chart-spx', dataPlot, layout);
       });
   }, []);
 
@@ -62,6 +100,7 @@ function App() {
       <div className="timeframe-wrapper">
         {timeFrames}
       </div>
+      <div className="chart" id='chart-spx'></div>
     </div>
   );
 }
