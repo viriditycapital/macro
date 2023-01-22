@@ -90,9 +90,18 @@ function App() {
           }
         };
 
-        console.log(dataPlot, layout)
-
         Plotly.newPlot('chart-spx', dataPlot, layout);
+
+        // Yields
+        const yieldData = data[1].response.observations;
+        const traceYields: Data ={
+          x: unpack(yieldData, 'date'),
+          y: unpack(yieldData, 'value'),
+          xaxis: 'x',
+          yaxis: 'y',
+        };
+
+        Plotly.newPlot('chart-yield-inversion', [traceYields]);
       });
   }, []);
 
@@ -105,6 +114,7 @@ function App() {
         {timeFrames}
       </div>
       <div className="chart" id='chart-spx'></div>
+      <div className="chart" id='chart-yield-inversion'></div>
     </div>
   );
 }
