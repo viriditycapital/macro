@@ -15,6 +15,8 @@ The idea of this project is to be able to look at economic indicators and _appro
 - Consumer debt
 - Highlight recession times: https://fred.stlouisfed.org/series/USREC
 - GDP numbers
+- Banks Tightening standards: https://fred.stlouisfed.org/series/DRTSCILM#0
+  - Tends to go up during recessions
 - Treasury rates (3 month, 1/2/5/15/30 YR)
   - Yield inversion: https://fred.stlouisfed.org/series/T10Y2Y
   - When the yield inverts, recession doesn't usually happen until the yield spread starts increasing again
@@ -25,6 +27,7 @@ The idea of this project is to be able to look at economic indicators and _appro
 - DOW
 - Have indicators explaining what the economy is currently going through
 - Maybe scan certain sectors to see if they are getting stronger of late
+- U.S. ISM Non-Manufacturing Purchasing Managers Index (PMI)
 
 ## Quant stuff
 
@@ -33,3 +36,7 @@ The idea of this project is to be able to look at economic indicators and _appro
 ## Infrastructure
 
 - To avoid a ton of HTTP requests, probably a good idea to have a server that scrapes data
+
+## TODO
+
+1. Recession Indicator: instead of doing a lot of work over and over again, we should preprocess it so that we just have a range of dates that are recessions. Then we can probably just filter from there

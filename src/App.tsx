@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Plotly, { Data, Layout } from 'plotly.js-dist-min'
+import Plotly, { Data, Datum, Layout } from 'plotly.js-dist-min'
 
 // Static data
 import USREC from './data/USREC.json';
@@ -72,7 +72,7 @@ function App() {
           open: unpack(historical, 'open'),
 
           increasing: { line: { color: 'green', width: 1 } },
-          decreasing: { line: { color: 'red' , width: 1 } },
+          decreasing: { line: { color: 'red', width: 1 } },
 
           xaxis: 'x',
           yaxis: 'y',
@@ -81,6 +81,7 @@ function App() {
 
         const dataPlot: Data[] = [trace];
 
+        const SPX_LEVELS: number[] = [3400, 3700, 3850, 3950, 4000, 4125, 4200];
         const layout: Partial<Layout> = {
           dragmode: 'zoom',
           showlegend: false,
@@ -99,20 +100,20 @@ function App() {
           title: {
             text: 'SPX'
           },
-          shapes: [
-            {
+          shapes: SPX_LEVELS.map(level => {
+            return {
               type: 'line',
               xref: 'paper',
               x0: 0,
-              y0: 4000,
+              y0: level,
               x1: 1,
-              y1: 4000,
+              y1: level,
               line: {
                 color: 'purple',
-                width: 2,
+                width: 1,
               }
-            }
-          ]
+            };
+          })
         };
 
         Plotly.newPlot('chart-spx', dataPlot, layout);
@@ -121,14 +122,14 @@ function App() {
         const vixData = data[3].historical;
 
         const traceVIX: Data = {
-          x:     unpack(vixData, 'date'),
+          x: unpack(vixData, 'date'),
           close: unpack(vixData, 'close'),
-          high:  unpack(vixData, 'high'),
-          low:   unpack(vixData, 'low'),
-          open:  unpack(vixData, 'open'),
+          high: unpack(vixData, 'high'),
+          low: unpack(vixData, 'low'),
+          open: unpack(vixData, 'open'),
 
           increasing: { line: { color: 'green', width: 1 } },
-          decreasing: { line: { color: 'red' , width: 1 } },
+          decreasing: { line: { color: 'red', width: 1 } },
 
           xaxis: 'x',
           yaxis: 'y',
@@ -153,10 +154,24 @@ function App() {
           title: {
             text: 'VIX'
           },
+          shapes: [
+            {
+              type: 'line',
+              xref: 'paper',
+              x0: 0,
+              y0: 20,
+              x1: 1,
+              y1: 20,
+              line: {
+                color: 'purple',
+                width: 2,
+              }
+            }
+          ]
         };
 
         Plotly.newPlot('chart-vix', [traceVIX], layoutVIX);
-        
+
 
         // Yields
         const yieldData = data[1].response.observations;
@@ -169,7 +184,21 @@ function App() {
         const layoutYields: Partial<Layout> = {
           title: {
             text: '10YR - 2YR Bond Yields'
-          }
+          },
+          shapes: [
+            {
+              type: 'line',
+              xref: 'paper',
+              x0: 0,
+              y0: 0,
+              x1: 1,
+              y1: 0,
+              line: {
+                color: 'purple',
+                width: 2,
+              }
+            }
+          ]
         }
 
         Plotly.newPlot('chart-yield-inversion', [traceYields], layoutYields);
