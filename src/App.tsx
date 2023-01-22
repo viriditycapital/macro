@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import Plotly, { Data, Datum, Layout } from 'plotly.js-dist-min'
 
-// Static data
-import USREC from './data/USREC.json';
-
 enum Tab {
   Macro,
   Stocks,
@@ -25,7 +22,9 @@ enum Timeframe {
 
 function App() {
   // State
+  // TODO: this is kinda deprecated, we just compute time. Also the actual number is being stored rn
   const [timeFrame, setTimeFrame] = useState(Timeframe["6m"]);
+  const [startDate, setStartDate] = useState(Number(new Date()) - timeFrame.valueOf() * 1000);
 
   // UI components
   const tabComponents = [];
@@ -43,7 +42,11 @@ function App() {
   for (const time in Timeframe) {
     if (Number(time) >= 0) {
       timeFrames.push(
-        <div className="timeframe" key={time}>
+        <div className={`timeframe ${Number(time) == timeFrame ? 'selected' : ''}`} key={time} onClick={() => {
+          // @ts-ignore
+          setTimeFrame(Number(time));
+          setStartDate(Number(new Date()) - Number(time) * 1000);
+        }}>
           {Timeframe[time]}
         </div>
       );
@@ -53,10 +56,10 @@ function App() {
   // Stock data
   useEffect(() => {
     Promise.all([
-      fetch(`/api/stonks/^GSPC?startDate=${Number(new Date()) - timeFrame.valueOf() * 1000}`).then(res => res.json()),
+      fetch(`/api/stonks/^GSPC?startDate=${startDate}`).then(res => res.json()),
       fetch(`/api/fred/T10Y2Y`).then(res => res.json()),
       fetch(`/api/fred/FPCPITOTLZGUSA`).then(res => res.json()),
-      fetch(`/api/stonks/^VIX?startDate=${Number(new Date()) - timeFrame.valueOf() * 1000}`).then(res => res.json()),
+      fetch(`/api/stonks/^VIX?startDate=${startDate}`).then(res => res.json()),
     ])
       .then(data => {
         console.log(data);
@@ -174,7 +177,7 @@ function App() {
 
 
         // Yields
-        const yieldData = data[1].response.observations;
+        const yieldData = data[1].response.observations.filter((entry: any) => new Date(entry.date) >= new Date(startDate));
         const traceYields: Data = {
           x: unpack(yieldData, 'date'),
           y: unpack(yieldData, 'value'),
@@ -219,7 +222,7 @@ function App() {
 
         Plotly.newPlot('chart-inflation', [traceInflation], layoutInflation);
       });
-  }, []);
+  }, [startDate]);
 
   return (
     <div className="App">

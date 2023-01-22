@@ -43,5 +43,9 @@ a:active {
     border: 1px solid white;
     margin: 4px;
     cursor: pointer;
+
+    &.selected {
+      border: 2px solid red;
+    }
   }
 }
