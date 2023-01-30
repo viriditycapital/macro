@@ -28,6 +28,8 @@ The idea of this project is to be able to look at economic indicators and _appro
 - Have indicators explaining what the economy is currently going through
 - Maybe scan certain sectors to see if they are getting stronger of late
 - U.S. ISM Non-Manufacturing Purchasing Managers Index (PMI)
+- DXY (Dollar Index)
+- Milliman 100 Pension Funding Index
 
 ## Quant stuff
 
